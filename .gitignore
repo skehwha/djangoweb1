@@ -131,3 +131,4 @@ dmypy.json
 # Pycham
 .idea/
 migrations/
+_media/
