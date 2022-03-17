@@ -9,7 +9,7 @@ class TestView(TestCase):
         self.user_trump=User.objects.create_user(username='trump', password='somepassword')
         self.user_obama = User.objects.create_user(username='obama', password='somepassword')
         self.category_programming=Category.objects.create(name='programming', slug='programming')
-        self.category_sports=Category.objects.create(name='sports', slug='sports') #여기까지함
+        self.category_sports=Category.objects.create(name='sports', slug='sports')
         self.post_001=Post.objects.create(
             title='첫번째 포스트',
             content='Hello, World!',
@@ -73,32 +73,26 @@ class TestView(TestCase):
         self.assertIn('아직 게시물이 없습니다', main_area.text)
 
     def test_post_detail(self):
-        # 1.1 포스트 1개 생성
-        post_001=Post.objects.create(
-            title='첫 번째 포스트입니다',
-            content='Hello World',
-            author=self.user_trump,
-        )
-        # 1.2 포스트의 url은 '/blog/1/'
-        self.assertEqual(post_001.get_absolute_url(), '/blog/1/')
 
-        # 2 첫번째 포스트의 상세 페이지 테스트
-        # 2.1 첫 번째 포스트의 url로 접근시 정상작동(status code 200)
-        response=self.client.get(post_001.get_absolute_url())
+        self.assertEqual(self.post_001.get_absolute_url(), '/blog/1/')
+
+        response=self.client.get(self.post_001.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         soup=BeautifulSoup(response.content, 'html.parser')
 
         self.navbar_test(soup)
-        # 2.3 첫 번째 포스트 제목이 웹브라우저 탭 타이틀에 있음
-        self.assertIn(post_001.title, soup.title.text)
-        # 2.4 첫 번째 포스트의 제목이 포스트 영역에 있음
-        main_area=soup.find('div', id='main-area')
+        self.category_card_test(soup)
+
+        self.assertIn(self.post_001.title, soup.title.text)
+
+        #main_area=soup.find('div', id='main-area')
         post_area=soup.find('div', id='post-area')
-        self.assertIn(post_001.title, post_area.text)
-        # 2.5 첫 번째 포스트의 작성자가 포스트 영역에 있음
+        self.assertIn(self.post_001.title, post_area.text)
+        self.assertIn(self.category_programming.name, post_area.text)
+
         self.assertIn(self.user_trump.username.upper(), post_area.text)
-        # 2.6 첫 번째 포스트의 내용이 포스트 영역에 있음
-        self.assertIn(post_001.content, post_area.text)
+
+        self.assertIn(self.post_001.content, post_area.text)
 
     def navbar_test(self, soup):
         # 1.1 네비게이션바가 있음
