@@ -113,3 +113,19 @@ class TestView(TestCase):
         about_me_btn = navbar.find('a', text="About Me")
         self.assertEqual(about_me_btn.attrs['href'], '/about_me/')
 
+    def test_category_page(self):
+        #고유 url 부여, 상태 200 확인
+        response=self.client.get(self.category_programming.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        #파싱
+        soup=BeautifulSoup(response.content, 'html.parser')
+        self.navbar_test(soup)
+        self.category_card_test(soup)
+        #카테고리 뱃지 나타나는지 확인
+        self.assertIn(self.category_programming.name, soup.h1.text)
+        #메인영역에 카테고리 이름이 있는지 확인, 이 카테고리에 해당하는 포스트만 노출, 그 외는 안보임
+        main_area=soup.find('div', id='main-area')
+        self.assertIn(self.category_programming.name, main_area.text)
+        self.assertIn(self.post_001.title, main_area.text)
+        self.assertNotIn(self.post_002.title, main_area.text)
+        self.assertNotIn(self.post_003.title, main_area.text)
