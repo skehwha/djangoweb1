@@ -1,5 +1,5 @@
             {% extends 'blog/base.html' %}
-            {% block main_area%}
+            {% block main_area %}
                 {% if user.is_authenticated %}
                     {% if user.is_superuser or user.is_staff %}
                         <a class="btn btn-info btn-sm float-right" href="/blog/create_post/" role="button">
@@ -29,9 +29,9 @@
                         {% if p.hook_text %}
                         <h5 class="text-muted">{{ p.hook_text }}</h5>
                         {% endif %}
-                        <p class="card-text">{{ p.content | truncatewords:40 }}</p>
+                        <p class="card-text">{{ p.get_content_markdown | truncatewords_html:45 | safe }}</p>
 
-                        {% if p.tags.exists%}
+                        {% if p.tags.exists %}
                         <i class="fas fa-tags"></i>
                             {% for tag in p.tags.iterator %}
                             <a href="{{ tag.get_absolute_url }}"><span class="badge badge-pill badge-light">{{ tag }}</span></a>
